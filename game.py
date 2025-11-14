@@ -23,7 +23,7 @@ class Game:
 
             # Movement logic: img_pos[1] is the y-coord
             # 
-            self.img_pos[1] += (-1*self.movement[0] + self.movement[1]) * 4 
+            self.img_pos[1] += (-1*self.movement[0] + self.movement[1]) * 5
 
             self.screen.blit(self.img, self.img_pos)
             
