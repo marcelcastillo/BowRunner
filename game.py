@@ -19,7 +19,7 @@ class Game:
         while True:
             self.screen.fill((14, 219, 248))            # Rerenders the screen with a blue/green hue
 
-
+            #Lemon
 
             # Movement logic: img_pos[1] is the y-coord
             # 
