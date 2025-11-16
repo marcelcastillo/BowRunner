@@ -10,9 +10,8 @@ def load_image(path):
     return img
 
 def load_images(path):
-
     # List of all our loaded images
     images = []
-    for img_name in os.listdir(BASE_IMG_PATH + path):
+    for img_name in sorted(os.listdir(BASE_IMG_PATH + path)):
         images.append(load_image(path + '/' + img_name))
     return images
