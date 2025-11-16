@@ -40,7 +40,7 @@ class Tilemap:
 
     def physics_rects_around(self, pos):
         '''Compute the "physics enabled" tiles around the player'''
-        # We only want to compute physics for 
+        # We only want to compute physics for tiles close to the player's position
         rects = []
         for tile in self.tiles_around(pos):
             if tile['type'] in PHYSICS_TILES:
@@ -56,11 +56,25 @@ class Tilemap:
             surf.blit(self.game.assets[tile['type']][tile['variant']], (tile['pos'][0] - offset[0], tile['pos'][1] - offset[1]))
 
         # Render the on-grid tiles
-        for loc in self.tilemap:
-            tile = self.tilemap[loc]
-            # Render the tile:           
-            # Get the type and variant specified in the tilemap above from the game assets
-                # Blit it to the screen at the position specified above
-            surf.blit(self.game.assets[tile['type']][tile['variant']], 
+        # For a given camera offset, get the tilemap grids that are visible to the display surface
+        # Transform pixel location to tile coordinate
+        for x in range(offset[0] // self.tile_size, (offset[0] + surf.get_width()) // self.tile_size + 1):
+            for y in range(offset[1] // self.tile_size, (offset[1] + surf.get_height()) // self.tile_size + 1):
+                loc = (x, y)
+                if loc in self.tilemap:
+                    tile = self.tilemap[loc]
+                    surf.blit(self.game.assets[tile['type']][tile['variant']], 
                         (tile['pos'][0] * self.tile_size - offset[0], tile['pos'][1] * self.tile_size - offset[1]))
+
+
+
+
+        # # Render the on-grid tiles
+        # for loc in self.tilemap:
+        #     tile = self.tilemap[loc]
+        #     # Render the tile:           
+        #     # Get the type and variant specified in the tilemap above from the game assets
+        #         # Blit it to the screen at the position specified above
+        #     surf.blit(self.game.assets[tile['type']][tile['variant']], 
+        #                 (tile['pos'][0] * self.tile_size - offset[0], tile['pos'][1] * self.tile_size - offset[1]))
         
