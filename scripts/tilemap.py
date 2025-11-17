@@ -66,15 +66,4 @@ class Tilemap:
                     surf.blit(self.game.assets[tile['type']][tile['variant']], 
                         (tile['pos'][0] * self.tile_size - offset[0], tile['pos'][1] * self.tile_size - offset[1]))
 
-
-
-
-        # # Render the on-grid tiles
-        # for loc in self.tilemap:
-        #     tile = self.tilemap[loc]
-        #     # Render the tile:           
-        #     # Get the type and variant specified in the tilemap above from the game assets
-        #         # Blit it to the screen at the position specified above
-        #     surf.blit(self.game.assets[tile['type']][tile['variant']], 
-        #                 (tile['pos'][0] * self.tile_size - offset[0], tile['pos'][1] * self.tile_size - offset[1]))
         
