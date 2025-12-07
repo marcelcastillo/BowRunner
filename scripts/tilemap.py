@@ -1,6 +1,19 @@
+import json
 import pygame
 
+AUTOTILE_MAP = {
+    tuple(sorted([(1, 0), (0, 1)])): 0,
+    tuple(sorted([(1, 0), (0, 1), (-1, 0)])): 1,
+    tuple(sorted([(-1, 0), (0, 1)])): 2, 
+    tuple(sorted([(-1, 0), (0, -1), (0, 1)])): 3,
+    tuple(sorted([(-1, 0), (0, -1)])): 4,
+    tuple(sorted([(-1, 0), (0, -1), (1, 0)])): 5,
+    tuple(sorted([(1, 0), (0, -1)])): 6,
+    tuple(sorted([(1, 0), (0, -1), (0, 1)])): 7,
+    tuple(sorted([(1, 0), (-1, 0), (0, 1), (0, -1)])): 8,
+}
 NEIGHBOR_OFFSETS = [(-1, 0), (-1, -1), (0, -1), (1, -1), (1, 0), (0, 0), (-1, 1), (0, 1), (1, 1)]
+AUTOTILE_TYPES = {'grass', 'stone'}
 PHYSICS_TILES = {'grass', 'stone'}
 
 class Tilemap:   
@@ -10,20 +23,17 @@ class Tilemap:
         self.tile_size = tile_size
         # Square grid of our tiles
         self.tilemap = {}
-        self.offgrid_tiles = []
+        self.offgrid_tiles = [] # A list of dictionaries
 
-        for i in range(10):
-            # These are grid coordinates, not pixel locations
-            self.tilemap[(3 + i, 10)] = { # Contents of 'tile' var in render
-                                        'type': 'grass', 
-                                        'variant': 1,
-                                        'pos': (3 + i, 10)
-                                        }
-            self.tilemap[(10, i + 5)] = {
-                                        'type': 'stone', 
-                                        'variant': 1,
-                                        'pos': (10, 5 + i)
-                                        }
+        # A simple horizontal platform of grass
+        # for i in range(10):
+        #     # These are grid coordinates, not pixel locations
+        #     self.tilemap[(3 + i, 10)] = { # Contents of 'tile' var in render
+        #                                 'type': 'grass', 
+        #                                 'variant': 1,
+        #                                 'pos': (3 + i, 10)
+        #                                 }
+        self.load('map.json')
     
     def tiles_around(self, pos):
         """Compute the tiles in the 3x3 "square around the player"""
@@ -37,6 +47,47 @@ class Tilemap:
                 tiles.append(self.tilemap[check_loc])
     
         return tiles
+
+    def save(self, path):
+        '''Create a JSON representation of the tilemap dictionary of our level'''
+        serializable = {
+            'tilemap': { f"{x};{y}": data for (x, y), data in self.tilemap.items() },
+            'tile_size': self.tile_size,
+            'offgrid': self.offgrid_tiles
+            }
+        with open(path, 'w') as f:
+            json.dump(serializable, f, indent=4)
+            f = open(path, 'w')
+            f.close()
+    
+    def load(self, path):
+        f = open(path, 'r')
+        map_data = json.load(f)
+        f.close()
+
+        tilemap = {}
+        for key, data in map_data['tilemap'].items():
+            x, y = map(int, key.split(';'))
+            data['pos'] = tuple(data['pos'])
+            tilemap[(x, y)] = data
+
+        self.tilemap = tilemap
+        self.tile_size = map_data['tile_size']
+        self.offgrid_tiles = map_data['offgrid']
+
+    def autotile(self):
+        for loc in self.tilemap:
+            tile = self.tilemap[loc] # (x, y)
+            neighbors = set()
+            for shift in [(1, 0), (-1, 0), (0, -1), (0, 1)]:
+                check_loc = (tile['pos'][0] + shift[0], tile['pos'][1] + shift[1])
+                if check_loc in self.tilemap:
+                    if self.tilemap[check_loc]['type'] == tile['type']:
+                        neighbors.add(shift)
+            neighbors = tuple(sorted(neighbors))
+            if (tile['type'] in AUTOTILE_TYPES) and (neighbors in AUTOTILE_MAP):
+                tile['variant'] = AUTOTILE_MAP[neighbors]
+
 
     def physics_rects_around(self, pos):
         '''Compute the "physics enabled" tiles around the player'''

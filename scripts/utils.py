@@ -6,7 +6,7 @@ BASE_IMG_PATH = 'data/images/'
 
 def load_image(path):
     full_path = BASE_IMG_PATH + path
-    print("Trying to load:", full_path)
+    # print("Trying to load:", full_path)
     img = pygame.image.load(BASE_IMG_PATH + path).convert() #Converts to pygame friendly representation
     img.set_colorkey((0, 0, 0))                             # Black becomes transparent
     return img
